@@ -8,7 +8,9 @@
 // WARRANTIES OF MERCHANTABILITY, FITNESS, NON-INFRINGEMENT, AND TITLE ARE
 // EXPRESSLY DISCLAIMED. NO AUTHOR SHALL BE LIABLE UNDER ANY THEORY OF LAW
 // FOR ANY DAMAGES OF ANY KIND RESULTING FROM THE USE OF THIS WORK.
+#include <locale.h>
 #include <wctype.h>
+#include <ctype.h>
 #include "trex.h" 
 
 static int match_xplus(const unsigned char *rex, const unsigned char *txt, const unsigned char *rexafter, int min);
@@ -22,6 +24,9 @@ static int cdpt(const unsigned char *s) {
     if (s[0]>>3==30 && s[1]>>6==2 && s[2]>>6==2 && s[3]>>6==2) return ((s[0] & 0x07)<<18 | (s[1] & 0x3F)<<12 | (s[2] & 0x3F)<<6 | (s[3] & 0x3F));
     return s[0];
 }
+
+// Workaround for poor iswalpha() support in some operating systems
+#define isualnum(x) ((*setlocale(LC_ALL, NULL) == 'C') ? (isalnum(x)) : (!iswcntrl(x) && !iswpunct(x) && !iswspace(x)))
 
 // Extremely hot codepath. Handling well-formed UTF-8 by macro --> ~4% speedup
 #define next(R) ((R[1]>>6!=2) ? (R+1) : (R[2]>>6!=2) ? (R+2) : \
@@ -41,8 +46,8 @@ static int matchclass(const unsigned char *rex, const unsigned char *txt) {
         case 'D':                return !iswdigit((wint_t)cdpt(txt));
         case 'x':                return  iswxdigit((wint_t)cdpt(txt));
         case 'X':                return !iswxdigit((wint_t)cdpt(txt));
-        case 'w':                return  (txt[0]=='_'||iswalnum((wint_t)cdpt(txt)));
-        case 'W':                return !(txt[0]=='_'||iswalnum((wint_t)cdpt(txt)));
+        case 'w':                return  (txt[0]=='_'||isualnum((wint_t)cdpt(txt)));
+        case 'W':                return !(txt[0]=='_'||isualnum((wint_t)cdpt(txt)));
         case 's':                return  iswspace((wint_t)cdpt(txt));
         case 'S':                return !iswspace((wint_t)cdpt(txt));
         default:                 return  (cdpt(rex) == cdpt(txt));

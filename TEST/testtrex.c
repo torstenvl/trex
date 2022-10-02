@@ -5,61 +5,66 @@
 #include "trex.h"
 
 struct testline {
-    unsigned char text[40];
+    int expect; 
+    int exttab;
     unsigned char regex[40];
-    int  expect; 
+    unsigned char text[40];
 };
 
 static struct testline testdata[] = {
-{ u8"fcharset178",          u8"^fcharset\\d\\d\\d",                       1 },
-{ u8"fcharset17",           u8"^fcharset\\d\\d\\d",                       0 },
-{ u8"fcharset««",           u8"^fcharset«+",                              1 },
-{ u8"fcharset",             u8"^fcharset«+",                              0 },
-{ u8"fcharset",             u8"^fcharset«*",                              1 },
-{ u8"Hello_World",          u8"Hello\\sWorld",                            0 },
-{ u8"Hello World",          u8"Hello ?World",                             1 },
-{ u8"HelloWorld",           u8"Hello ?World",                             1 },
-{ u8"Hello  World",         u8"Hello ?World",                             0 },
-{ u8"abdcbabcdefg",         u8"abc",                                      1 },
-{ u8"abdcbabcdefg",         u8"^abc",                                     0 },
-{ u8"https://google.com",   u8"^.*s://",                                  1 },
-{ u8"http://google.com",    u8"^.*s://",                                  0 },
-{ u8"\\\'ab",               u8"\\\\\\'\\x\\x",                            1 },
-{ u8"\\uc1\\u171\\\'ab",    u8"\\\\\\'\\x\\x",                            1 },
-{ u8"\\uc1\\u171\\\'ab",    u8"^\\\\\\'\\x\\x",                           0 },
-{ u8"\\\'fg",               u8"\\\\\\'\\x\\x",                            0 },
-{ u8"(505) 867-5309",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    1 },
-{ u8"(865) 409-1021",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d$",   1 },
-{ u8"(865) 409-I021",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    0 },
-{ u8"(505) 86765309",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    0 },
-{ u8"(865) 409-1021",       u8"\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",   1 },
-{ u8"(865) 409-1021",       u8"^\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",  0 },
-{ u8"5",                    u8"\\d",                                      1 },
-{ u8"hej",                  u8"\\w+",                                     1 },
-{ u8"hej",                  u8"\\D",                                      1 },
-{ u8"hej",                  u8"\\d",                                      0 },
+{1, 0, u8"^fcharset\\d\\d\\d",                      u8"fcharset178"          },
+{0, 0, u8"^fcharset\\d\\d\\d",                      u8"fcharset17"           },
+{1, 0, u8"^fcharset«+",                             u8"fcharset««"           },
+{0, 0, u8"^fcharset«+",                             u8"fcharset"             },
+{1, 0, u8"^fcharset«*",                             u8"fcharset"             },
+{0, 0, u8"Hello\\sWorld",                           u8"Hello_World"          },
+{1, 0, u8"Hello ?World",                            u8"Hello World"          },
+{1, 0, u8"Hello ?World",                            u8"HelloWorld"           },
+{0, 0, u8"Hello ?World",                            u8"Hello  World"         },
+{1, 0, u8"abc",                                     u8"abdcbabcdefg"         },
+{0, 0, u8"^abc",                                    u8"abdcbabcdefg"         },
+{1, 0, u8"^.*s://",                                 u8"https://google.com"   },
+{0, 0, u8"^.*s://",                                 u8"http://google.com"    },
+{1, 0, u8"\\\\\\'\\x\\x",                           u8"\\\'ab"               },
+{1, 0, u8"\\\\\\'\\x\\x",                           u8"\\uc1\\u171\\\'ab"    },
+{0, 0, u8"^\\\\\\'\\x\\x",                          u8"\\uc1\\u171\\\'ab"    },
+{0, 0, u8"\\\\\\'\\x\\x",                           u8"\\\'fg"               },
+{1, 0, u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",   u8"(505) 867-5309"       },
+{1, 0, u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d$",  u8"(865) 409-1021"       },
+{0, 0, u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",   u8"(865) 409-I021"       },
+{0, 0, u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",   u8"(505) 86765309"       },
+{1, 0, u8"\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",  u8"(865) 409-1021"       },
+{0, 0, u8"^\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d", u8"(865) 409-1021"       },
+{1, 0, u8"\\d",                                     u8"5"                    },
+{1, 0, u8"\\w+",                                    u8"hej"                  },
+{1, 0, u8"\\D",                                     u8"hej"                  },
+{0, 0, u8"\\d",                                     u8"hej"                  },
 };
 
 static struct testline ctestdata[] = {
-{ u8"élan",                 u8"^\\w+$",                                   0 },
-{ u8"flêche",               u8"^\\w+$",                                   0 },
-{ u8"régulières",           u8"^\\w+$",                                   0 },
-{ u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT", u8"^\\w+$",                                   0 },
-{ u8"NéÊêËµ62aßªÈÈfÞÀvFlï", u8"^\\w+$",                                   0 },
-{ u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",u8"^\\w+$",                                   0 },
-{ u8"Բարեւ_Ձեզ։",           u8"^\\w+$",                                   0 },
-{ u8"Բարեւ_Ձեզ",           u8"^\\w+$",                                   0 },
+{0, 0, u8"^\\w+$",                                  u8"élan"                 },
+{0, 0, u8"^\\w+$",                                  u8"flêche"               },
+{0, 0, u8"^\\w+$",                                  u8"régulières"           },
+{0, 0, u8"^\\w+$",                                  u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT" },
+{0, 0, u8"^\\w+$",                                  u8"NéÊêËµ62aßªÈÈfÞÀvFlï" },
+{0, 0, u8"^\\w+$",                                  u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR"},
+{0, 1, u8"^\\w+$",                                  u8"Բարեւ_Ձեզ։"           },
+{0, 1, u8"^\\w+$",                                  u8"Բարեւ_Ձեզ"            },
+{0, 1, u8"^\\w+$",                                  u8"مرحبًا؟"               },
+{0, 1, u8"^\\w+$",                                  u8"مرحبًا"                },
 };
 
 static struct testline loctestdata[] = {
-{ u8"élan",                 u8"^\\w+$",                                   1 },
-{ u8"flêche",               u8"^\\w+$",                                   1 },
-{ u8"régulières",           u8"^\\w+$",                                   1 },
-{ u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT", u8"^\\w+$",                                   1 },
-{ u8"NéÊêËµ62aßªÈÈfÞÀvFlï", u8"^\\w+$",                                   1 },
-{ u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",u8"^\\w+$",                                   1 },
-{ u8"Բարեւ_Ձեզ։",           u8"^\\w+$",                                   0 },
-{ u8"Բարեւ_Ձեզ",           u8"^\\w+$",                                   1 },
+{1, 0, u8"^\\w+$",                                  u8"élan"                 },
+{1, 0, u8"^\\w+$",                                  u8"flêche"               },
+{1, 0, u8"^\\w+$",                                  u8"régulières"           },
+{1, 0, u8"^\\w+$",                                  u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT" },
+{1, 0, u8"^\\w+$",                                  u8"NéÊêËµ62aßªÈÈfÞÀvFlï" },
+{1, 0, u8"^\\w+$",                                  u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR"},
+{0, 1, u8"^\\w+$",                                  u8"Բարեւ_Ձեզ։"           },
+{1, 1, u8"^\\w+$",                                  u8"Բարեւ_Ձեզ"            },
+{0, 1, u8"^\\w+$",                                  u8"مرحبًا؟"               },
+{1, 1, u8"^\\w+$",                                  u8"مرحبًا"                },
 };
 
 static const char YES[] = "yes";
@@ -81,8 +86,8 @@ int main(void) {
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
-        printf("%-20s\t\t%-30s\t%3s %3s  %s %s\n", 
-               td[i].text, td[i].regex,
+        printf("%-20s\t\t%s%-30s\t%3s %3s  %s %s\n", 
+               td[i].text, (td[i].exttab)?"\t":"", td[i].regex,
                (result)?YES:NO, (td[i].expect)?YES:NO,
                (result == td[i].expect)?LOUDYES:LOUDNO,
                (result == td[i].expect)?"good":"FAIL");
@@ -97,8 +102,8 @@ int main(void) {
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
-        printf("%-20s\t\t%-30s\t%3s %3s  %s %s\n", 
-               td[i].text, td[i].regex,
+        printf("%-20s\t\t%s%-30s\t%3s %3s  %s %s\n", 
+               td[i].text, (td[i].exttab)?"\t":"", td[i].regex,
                (result)?YES:NO, (td[i].expect)?YES:NO,
                (result == td[i].expect)?LOUDYES:LOUDNO,
                (result == td[i].expect)?"good":"FAIL");
@@ -113,8 +118,8 @@ int main(void) {
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
-        printf("%-20s\t\t%-30s\t%3s %3s  %s %s\n", 
-               td[i].text, td[i].regex,
+        printf("%-20s\t\t%s%-30s\t%3s %3s  %s %s\n", 
+               td[i].text, (td[i].exttab)?"\t":"", td[i].regex,
                (result)?YES:NO, (td[i].expect)?YES:NO,
                (result == td[i].expect)?LOUDYES:LOUDNO,
                (result == td[i].expect)?"good":"FAIL");
