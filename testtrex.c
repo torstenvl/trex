@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "trex.h"
 
 struct testline {
@@ -77,6 +78,13 @@ static struct testline testdata[] = {
 { "Xaa",                    "a*$",                                        1 },
 { "abcabc",                 ".*c",                                        1 },
 { "abcabc",                 ".+c",                                        1 },
+{ "hej",                    "^\\w+$",                                     1 },
+{ "élan",                   "^\\w+$",                                     1 },
+{ "élan",                   "^\\W+$",                                     0 },
+{ "lan",                    "^\\W+$",                                     0 },
+{ "é",                      "^\\W$",                                      0 },
+{ "flêche",                 "^\\w+$",                                     1 },
+{ "régulières",             "^\\w+$",                                     1 },
 };
 
 static const char YES[] = "yes";
@@ -84,15 +92,16 @@ static const char NO[]  = "no";
 static const char LOUDYES[] = { 0xE2, 0x9C, 0x85, 0x00 };
 static const char LOUDNO[]  = { 0xE2, 0x9D, 0x8C, 0x00 };
 
-
 int main(void) {
-    struct testline *td     = testdata;
-    size_t nrecords  = sizeof(testdata) / sizeof(struct testline);
+    struct testline *td = testdata;
+    size_t nrecords = sizeof(testdata) / sizeof(struct testline);
     size_t i;
     int result;
 
+    setlocale(LC_ALL, "fr_FR.UTF-8");
+
     printf(" \n%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
-    printf("--------------------------------------------------------------------------------\n");
+    printf("————————————————————————————————————————————————————————————————————————————————\n");
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
@@ -101,9 +110,7 @@ int main(void) {
                (result)?YES:NO, (td[i].expect)?YES:NO,
                (result == td[i].expect)?LOUDYES:LOUDNO,
                (result == td[i].expect)?"good":"FAIL");
-        // printf("Idx/Match:%3d/%1s  Expect:%3d/%1s    TEST: %2s\n",  
     }
-
 
     return 0;
 }
