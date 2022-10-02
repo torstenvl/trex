@@ -2,11 +2,12 @@
 //                      tiny regular expression library
 //
 // Written in 2022 by Joshua Lee Ockert <https://github.com/torstenvl/>
-//
-// Hereby released into the public domain. In jurisdictions that do not 
-// recognize the dedication of work to the public domain, this work is also
-// released under the ISC license. https://opensource.org/licenses/ISC
-
+// The author disclaims all copyright in this work. Permission to use, copy, 
+// modify, and/or distribute this work for any purpose is hereby granted.
+// THIS WORK IS PROVIDED "AS IS" WITH NO WARRANTY OF ANY KIND. THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY, FITNESS, NON-INFRINGEMENT, AND TITLE ARE
+// EXPRESSLY DISCLAIMED. NO AUTHOR SHALL BE LIABLE UNDER ANY THEORY OF LAW
+// FOR ANY DAMAGES OF ANY KIND RESULTING FROM THE USE OF THIS WORK.
 #ifndef TREX__
 #define TREX__
 

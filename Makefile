@@ -8,7 +8,7 @@ else
 	CC           :=  clang
 	WEXCLUDE     :=  -Wno-poison-system-directories
 	WEVERYTHING  :=  -Weverything 
-    CFLAGS       :=  -std=c11 -funsigned-char -Os
+    CFLAGS       :=  -std=c11 -funsigned-char -Oz
     STRICT       :=  -W -Wall -Werror -Wextra $(WEVERYTHING) $(WEXCLUDE)
 endif
 
@@ -21,7 +21,7 @@ testsuiteprologue:
 testsuiteepilogue:
 	@echo
 
-TESTSTART   =   printf "%s %-36s" "Testing" $(subst test_,,$@)
+TESTSTART   =   printf "%s %-36s\n" "Testing" $(subst test_,,$@)
 TESTCC      :=  $(CC) $(CFLAGS) $(STRICT)
 TESTTGT     :=  ./testexec
 
@@ -31,7 +31,7 @@ test_regexes: $(ALLSRC)
 	@$(TESTSTART)
 	@$(TESTCC) testtrex.c trex.c -o $(TESTTGT)
 	@$(TESTTGT)
-	@rm $(TESTTGT)
+#	@rm $(TESTTGT)
 
 clean:
 	@rm -Rf .DS_Store core *.o *~

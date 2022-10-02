@@ -10,81 +10,51 @@ struct testline {
 };
 
 static struct testline testdata[] = {
-{ "Hello World",            "Hello\\sWorld",                              1 },
-{ "Hello_World",            "Hello\\sWorld",                              0 },
-{ "HelloRWorld",            "Hello\\sWorld",                              0 },
-{ "Hello World",            "Hello ?World",                               1 },
-{ "HelloWorld",             "Hello ?World",                               1 },
-{ "Hello  World",           "Hello ?World",                               0 },
 { "fcharset178",            "^fcharset\\d\\d\\d",                         1 },
-{ "fcharset204",            "^fcharset\\d\\d\\d",                         1 },
 { "fcharset17",             "^fcharset\\d\\d\\d",                         0 },
-{ "fcharset17",             "^fcharset\\d+",                              1 },
-{ "fcharset2",              "^fcharset\\d+",                              1 },
-{ "fcharset1",              "^fcharset\\d+",                              1 },
-{ "fcharset07",             "^fcharset\\d+",                              1 },
-{ "fcharset",               "^fcharset\\d+",                              0 },
-{ "fcharset",               "^fcharset\\d*",                              1 },
-{ "fchaéset",               "^fchaéset\\d*",                              1 },
 { "fcharset««",             "^fcharset«+",                                1 },
 { "fcharset",               "^fcharset«+",                                0 },
 { "fcharset",               "^fcharset«*",                                1 },
-{ "http://google.com",      "^.*tp",                                      1 },
-{ "http://google.com",      "tp",                                         1 },
-{ "Fellows of Harvard",     "l+",                                         1 },
-{ "Fellow chickens",        "ll+",                                        1 },
-{ "boo5bear",               "\\d",                                        1 },
-{ "boobear",                "\\x",                                        1 },
-{ "oobear",                 "\\x",                                        1 },
-{ "obear",                  "\\x",                                        1 },
+{ "Hello_World",            "Hello\\sWorld",                              0 },
+{ "Hello World",            "Hello ?World",                               1 },
+{ "HelloWorld",             "Hello ?World",                               1 },
+{ "Hello  World",           "Hello ?World",                               0 },
+{ "abdcbabcdefg",           "abc",                                        1 },
+{ "abdcbabcdefg",           "^abc",                                       0 },
+{ "https://google.com",     "^.*s://",                                    1 },
+{ "http://google.com",      "^.*s://",                                    0 },
 { "\\\'ab",                 "\\\\\\'\\x\\x",                              1 },
-{ "\\rtf\\\'ff",            "\\\\\\'\\x\\x",                              1 },
+{ "\\uc1\\u171\\\'ab",      "\\\\\\'\\x\\x",                              1 },
+{ "\\uc1\\u171\\\'ab",      "^\\\\\\'\\x\\x",                             0 },
 { "\\\'fg",                 "\\\\\\'\\x\\x",                              0 },
-{ "\\\'00",                 "\\\\\\'\\x\\x",                              1 },
 { "(505) 867-5309",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      1 },
 { "(865) 409-1021",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d$",     1 },
 { "(865) 409-I021",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      0 },
 { "(505) 86765309",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      0 },
-{ "(865) 409-1021",         ".*\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",   1 },
-{ "(865) 4O9-1021",         ".*\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",   0 },
 { "(865) 409-1021",         "\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",     1 },
 { "(865) 409-1021",         "^\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",    0 },
-{ "abdcbabcdefg",           "abc",                                        1 },
-{ "abdcbabcdefg",           "crex",                                       0 },
-{ "abdcbabcdefg",           "^abc",                                       0 },
 { "5",                      "\\d",                                        1 },
 { "hej",                    "\\w+",                                       1 },
-{ "5",                      "\\D",                                        0 },
-{ "hej",                    "\\W+",                                       0 },
 { "hej",                    "\\D",                                        1 },
 { "hej",                    "\\d",                                        0 },
-{ "0|",                     "0|",                                         1 },
-{ "0s:00:00",               "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "000:00",                 "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "00:0000",                "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "100:0:00",               "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "00:100:00",              "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "0:00:100",               "\\d\\d:\\d\\d:\\d\\d",                       0 },
-{ "0:0:0",                  "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "0:00:0",                 "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "0:0:00",                 "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "00:0:0",                 "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "00:00:0",                "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "00:0:00",                "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "0:00:00",                "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "00:00:00",               "\\d\\d?:\\d\\d?:\\d\\d?",                    1 },
-{ "a:0",                    "\\d\\d?:\\d\\d?:\\d\\d?",                    0 },
-{ "c:\\Tools",              "^.*\\\\.*$",                                 1 },
-{ "Xaa",                    "a*$",                                        1 },
-{ "abcabc",                 ".*c",                                        1 },
-{ "abcabc",                 ".+c",                                        1 },
-{ "hej",                    "^\\w+$",                                     1 },
+};
+
+static struct testline ctestdata[] = {
+{ "élan",                   "^\\w+$",                                     0 },
+{ "flêche",                 "^\\w+$",                                     0 },
+{ "régulières",             "^\\w+$",                                     0 },
+{ "zÇUùÑ_yÿáCêÑ5Ä6ÑøýCTFoæ","^\\w+$",                                     0 },
+{ "NéÊêËµ62aßªÈÈfÞÀvFlïZdc","^\\w+$",                                     0 },
+{ "îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",  "^\\w+$",                                     0 },
+};
+
+static struct testline frtestdata[] = {
 { "élan",                   "^\\w+$",                                     1 },
-{ "élan",                   "^\\W+$",                                     0 },
-{ "lan",                    "^\\W+$",                                     0 },
-{ "é",                      "^\\W$",                                      0 },
 { "flêche",                 "^\\w+$",                                     1 },
 { "régulières",             "^\\w+$",                                     1 },
+{ "zÇUùÑ_yÿáCêÑ5Ä6ÑøýCTFoæ","^\\w+$",                                     1 },
+{ "NéÊêËµ62aßªÈÈfÞÀvFlïZdc","^\\w+$",                                     1 },
+{ "îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",  "^\\w+$",                                     1 },
 };
 
 static const char YES[] = "yes";
@@ -98,10 +68,11 @@ int main(void) {
     size_t i;
     int result;
 
-    setlocale(LC_ALL, "fr_FR.UTF-8");
-
-    printf(" \n%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
+    printf("\n\n");
+    printf("%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
     printf("————————————————————————————————————————————————————————————————————————————————\n");
+    nrecords = sizeof(testdata) / sizeof(struct testline);
+    td = testdata;
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
@@ -111,6 +82,39 @@ int main(void) {
                (result == td[i].expect)?LOUDYES:LOUDNO,
                (result == td[i].expect)?"good":"FAIL");
     }
+
+    setlocale(LC_ALL, "C");
+    printf("\nLocale:  C\n");
+    printf("%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
+    printf("————————————————————————————————————————————————————————————————————————————————\n");
+    nrecords = sizeof(ctestdata) / sizeof(struct testline);
+    td = ctestdata;
+    for (i = 0; i < nrecords; i++) {
+        result = regexmatch(td[i].regex, td[i].text);
+
+        printf("%-20s\t\t%-30s\t%3s %3s  %s %s\n", 
+               td[i].text, td[i].regex,
+               (result)?YES:NO, (td[i].expect)?YES:NO,
+               (result == td[i].expect)?LOUDYES:LOUDNO,
+               (result == td[i].expect)?"good":"FAIL");
+    }
+    
+    setlocale(LC_ALL, "en_US.UTF-8");
+    printf("\nLocale:  en_US.UTF-8\n");
+    printf("%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
+    printf("————————————————————————————————————————————————————————————————————————————————\n");
+    nrecords = sizeof(frtestdata) / sizeof(struct testline);
+    td = frtestdata;
+    for (i = 0; i < nrecords; i++) {
+        result = regexmatch(td[i].regex, td[i].text);
+
+        printf("%-20s\t\t%-30s\t%3s %3s  %s %s\n", 
+               td[i].text, td[i].regex,
+               (result)?YES:NO, (td[i].expect)?YES:NO,
+               (result == td[i].expect)?LOUDYES:LOUDNO,
+               (result == td[i].expect)?"good":"FAIL");
+    }
+
 
     return 0;
 }

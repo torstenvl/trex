@@ -2,25 +2,27 @@
 //                      tiny regular expression library
 //
 // Written in 2022 by Joshua Lee Ockert <https://github.com/torstenvl/>
-//
-// Hereby released into the public domain. In jurisdictions that do not 
-// recognize the dedication of work to the public domain, this work is also
-// released under the ISC license. https://opensource.org/licenses/ISC
-
+// The author disclaims all copyright in this work. Permission to use, copy, 
+// modify, and/or distribute this work for any purpose is hereby granted.
+// THIS WORK IS PROVIDED "AS IS" WITH NO WARRANTY OF ANY KIND. THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY, FITNESS, NON-INFRINGEMENT, AND TITLE ARE
+// EXPRESSLY DISCLAIMED. NO AUTHOR SHALL BE LIABLE UNDER ANY THEORY OF LAW
+// FOR ANY DAMAGES OF ANY KIND RESULTING FROM THE USE OF THIS WORK.
 #include <stdlib.h>
-#include <ctype.h>
+#include <wctype.h>
 #include "trex.h" 
 
-// These two rely on and are relied upon by matchhere(); need upfront decls
 static int match_xplus(const unsigned char *rex, const unsigned char *txt, const unsigned char *rexafter, int min);
 static int match_maybe(const unsigned char *rex, const unsigned char *txt, const unsigned char *rexafter);
 
-//  For byte patterns matching this...                                            ... get the correct bits from them, big-endian style
-#define cdpt(s) ((s[0]<128) ? s[0] :\
-    (s[0]>>5== 6 && s[1]>>6==2                            ) ?                                         (s[0] & 0x1F)<<6 | (s[1] & 0x3F) :\
-    (s[0]>>4==14 && s[1]>>6==2 && s[2]>>6==2              ) ?                     (s[0] & 0x0F)<<12 | (s[1] & 0x3F)<<6 | (s[2] & 0x3F) :\
-    (s[0]>>3==30 && s[1]>>6==2 && s[2]>>6==2 && s[3]>>6==2) ? (s[0] & 0x07)<<18 | (s[1] & 0x3F)<<12 | (s[2] & 0x3F)<<6 | (s[3] & 0x3F) :\
-    s[0]) 
+static int cdpt(const unsigned char *s) {
+    if (s[0]<128) return s[0];
+    // For byte patterns matching this...                                     ... get the correct bits from them and put them in the right places
+    if (s[0]>>5== 6 && s[1]>>6==2)                             return                                         ((s[0] & 0x1F)<<6 | (s[1] & 0x3F));
+    if (s[0]>>4==14 && s[1]>>6==2 && s[2]>>6==2)               return                     ((s[0] & 0x0F)<<12 | (s[1] & 0x3F)<<6 | (s[2] & 0x3F));
+    if (s[0]>>3==30 && s[1]>>6==2 && s[2]>>6==2 && s[3]>>6==2) return ((s[0] & 0x07)<<18 | (s[1] & 0x3F)<<12 | (s[2] & 0x3F)<<6 | (s[3] & 0x3F));
+    return s[0];
+}
 
 // Extremely hot codepath. Handling well-formed UTF-8 by macro --> ~4% speedup
 #define next(R) ((R[1]>>6!=2) ? (R+1) : (R[2]>>6!=2) ? (R+2) : \
@@ -36,14 +38,14 @@ static const unsigned char *prev(const unsigned char *rex) {
 
 static int matchclass(const unsigned char *rex, const unsigned char *txt) {
     switch (rex[0]) {  // Add custom classes here in lieu of ranges
-        case 'd':                return  isdigit(txt[0]);
-        case 'D':                return !isdigit(txt[0]);
-        case 'x':                return  isxdigit(txt[0]);
-        case 'X':                return !isxdigit(txt[0]);
-        case 'w':                return  (txt[0]=='_'||isalnum(txt[0]));
-        case 'W':                return !(txt[0]=='_'||isalnum(txt[0]));
-        case 's':                return  isspace(txt[0]);
-        case 'S':                return !isspace(txt[0]);
+        case 'd':                return  iswdigit(txt[0]);
+        case 'D':                return !iswdigit(txt[0]);
+        case 'x':                return  iswxdigit(txt[0]);
+        case 'X':                return !iswxdigit(txt[0]);
+        case 'w':                return  (txt[0]=='_'||iswalnum(txt[0]));
+        case 'W':                return !(txt[0]=='_'||iswalnum(txt[0]));
+        case 's':                return  iswspace(txt[0]);
+        case 'S':                return !iswspace(txt[0]);
         default:                 return  (cdpt(rex) == cdpt(txt));
     }
 }
