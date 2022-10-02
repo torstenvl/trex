@@ -6,7 +6,7 @@ ifeq ($(shell cc -v 2>&1 | grep clang),"")
     STRICT       :=  -W -Wall -Werror -Wextra $(WEVERYTHING) $(WEXCLUDE)
 else
 	CC           :=  clang
-	WEXCLUDE     :=  -Wno-poison-system-directories
+	WEXCLUDE     :=  -Wno-poison-system-directories -Wno-c99-compat
 	WEVERYTHING  :=  -Weverything 
     CFLAGS       :=  -std=c11 -funsigned-char -Oz
     STRICT       :=  -W -Wall -Werror -Wextra $(WEVERYTHING) $(WEXCLUDE)

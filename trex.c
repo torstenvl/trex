@@ -8,7 +8,6 @@
 // WARRANTIES OF MERCHANTABILITY, FITNESS, NON-INFRINGEMENT, AND TITLE ARE
 // EXPRESSLY DISCLAIMED. NO AUTHOR SHALL BE LIABLE UNDER ANY THEORY OF LAW
 // FOR ANY DAMAGES OF ANY KIND RESULTING FROM THE USE OF THIS WORK.
-#include <stdlib.h>
 #include <wctype.h>
 #include "trex.h" 
 
@@ -38,14 +37,14 @@ static const unsigned char *prev(const unsigned char *rex) {
 
 static int matchclass(const unsigned char *rex, const unsigned char *txt) {
     switch (rex[0]) {  // Add custom classes here in lieu of ranges
-        case 'd':                return  iswdigit(txt[0]);
-        case 'D':                return !iswdigit(txt[0]);
-        case 'x':                return  iswxdigit(txt[0]);
-        case 'X':                return !iswxdigit(txt[0]);
-        case 'w':                return  (txt[0]=='_'||iswalnum(txt[0]));
-        case 'W':                return !(txt[0]=='_'||iswalnum(txt[0]));
-        case 's':                return  iswspace(txt[0]);
-        case 'S':                return !iswspace(txt[0]);
+        case 'd':                return  iswdigit((wint_t)cdpt(txt));
+        case 'D':                return !iswdigit((wint_t)cdpt(txt));
+        case 'x':                return  iswxdigit((wint_t)cdpt(txt));
+        case 'X':                return !iswxdigit((wint_t)cdpt(txt));
+        case 'w':                return  (txt[0]=='_'||iswalnum((wint_t)cdpt(txt)));
+        case 'W':                return !(txt[0]=='_'||iswalnum((wint_t)cdpt(txt)));
+        case 's':                return  iswspace((wint_t)cdpt(txt));
+        case 'S':                return !iswspace((wint_t)cdpt(txt));
         default:                 return  (cdpt(rex) == cdpt(txt));
     }
 }

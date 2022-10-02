@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <wchar.h>
 #include <stdlib.h>
 #include <locale.h>
 #include "trex.h"
@@ -10,51 +11,55 @@ struct testline {
 };
 
 static struct testline testdata[] = {
-{ "fcharset178",            "^fcharset\\d\\d\\d",                         1 },
-{ "fcharset17",             "^fcharset\\d\\d\\d",                         0 },
-{ "fcharset««",             "^fcharset«+",                                1 },
-{ "fcharset",               "^fcharset«+",                                0 },
-{ "fcharset",               "^fcharset«*",                                1 },
-{ "Hello_World",            "Hello\\sWorld",                              0 },
-{ "Hello World",            "Hello ?World",                               1 },
-{ "HelloWorld",             "Hello ?World",                               1 },
-{ "Hello  World",           "Hello ?World",                               0 },
-{ "abdcbabcdefg",           "abc",                                        1 },
-{ "abdcbabcdefg",           "^abc",                                       0 },
-{ "https://google.com",     "^.*s://",                                    1 },
-{ "http://google.com",      "^.*s://",                                    0 },
-{ "\\\'ab",                 "\\\\\\'\\x\\x",                              1 },
-{ "\\uc1\\u171\\\'ab",      "\\\\\\'\\x\\x",                              1 },
-{ "\\uc1\\u171\\\'ab",      "^\\\\\\'\\x\\x",                             0 },
-{ "\\\'fg",                 "\\\\\\'\\x\\x",                              0 },
-{ "(505) 867-5309",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      1 },
-{ "(865) 409-1021",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d$",     1 },
-{ "(865) 409-I021",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      0 },
-{ "(505) 86765309",         "^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",      0 },
-{ "(865) 409-1021",         "\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",     1 },
-{ "(865) 409-1021",         "^\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",    0 },
-{ "5",                      "\\d",                                        1 },
-{ "hej",                    "\\w+",                                       1 },
-{ "hej",                    "\\D",                                        1 },
-{ "hej",                    "\\d",                                        0 },
+{ u8"fcharset178",          u8"^fcharset\\d\\d\\d",                       1 },
+{ u8"fcharset17",           u8"^fcharset\\d\\d\\d",                       0 },
+{ u8"fcharset««",           u8"^fcharset«+",                              1 },
+{ u8"fcharset",             u8"^fcharset«+",                              0 },
+{ u8"fcharset",             u8"^fcharset«*",                              1 },
+{ u8"Hello_World",          u8"Hello\\sWorld",                            0 },
+{ u8"Hello World",          u8"Hello ?World",                             1 },
+{ u8"HelloWorld",           u8"Hello ?World",                             1 },
+{ u8"Hello  World",         u8"Hello ?World",                             0 },
+{ u8"abdcbabcdefg",         u8"abc",                                      1 },
+{ u8"abdcbabcdefg",         u8"^abc",                                     0 },
+{ u8"https://google.com",   u8"^.*s://",                                  1 },
+{ u8"http://google.com",    u8"^.*s://",                                  0 },
+{ u8"\\\'ab",               u8"\\\\\\'\\x\\x",                            1 },
+{ u8"\\uc1\\u171\\\'ab",    u8"\\\\\\'\\x\\x",                            1 },
+{ u8"\\uc1\\u171\\\'ab",    u8"^\\\\\\'\\x\\x",                           0 },
+{ u8"\\\'fg",               u8"\\\\\\'\\x\\x",                            0 },
+{ u8"(505) 867-5309",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    1 },
+{ u8"(865) 409-1021",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d$",   1 },
+{ u8"(865) 409-I021",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    0 },
+{ u8"(505) 86765309",       u8"^(\\d\\d\\d) \\d\\d\\d\\-\\d\\d\\d\\d",    0 },
+{ u8"(865) 409-1021",       u8"\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",   1 },
+{ u8"(865) 409-1021",       u8"^\\d\\d\\d\\D*\\d\\d\\d\\D*\\d\\d\\d\\d",  0 },
+{ u8"5",                    u8"\\d",                                      1 },
+{ u8"hej",                  u8"\\w+",                                     1 },
+{ u8"hej",                  u8"\\D",                                      1 },
+{ u8"hej",                  u8"\\d",                                      0 },
 };
 
 static struct testline ctestdata[] = {
-{ "élan",                   "^\\w+$",                                     0 },
-{ "flêche",                 "^\\w+$",                                     0 },
-{ "régulières",             "^\\w+$",                                     0 },
-{ "zÇUùÑ_yÿáCêÑ5Ä6ÑøýCTFoæ","^\\w+$",                                     0 },
-{ "NéÊêËµ62aßªÈÈfÞÀvFlïZdc","^\\w+$",                                     0 },
-{ "îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",  "^\\w+$",                                     0 },
+{ u8"élan",                 u8"^\\w+$",                                   0 },
+{ u8"flêche",               u8"^\\w+$",                                   0 },
+{ u8"régulières",           u8"^\\w+$",                                   0 },
+{ u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT", u8"^\\w+$",                                   0 },
+{ u8"NéÊêËµ62aßªÈÈfÞÀvFlï", u8"^\\w+$",                                   0 },
+{ u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",u8"^\\w+$",                                   0 },
+{ u8"Բարեւ_Ձեզ։",           u8"^\\w+$",                                   0 },
+{ u8"Բարեւ_Ձեզ",           u8"^\\w+$",                                   0 },
 };
 
-static struct testline frtestdata[] = {
-{ "élan",                   "^\\w+$",                                     1 },
-{ "flêche",                 "^\\w+$",                                     1 },
-{ "régulières",             "^\\w+$",                                     1 },
-{ "zÇUùÑ_yÿáCêÑ5Ä6ÑøýCTFoæ","^\\w+$",                                     1 },
-{ "NéÊêËµ62aßªÈÈfÞÀvFlïZdc","^\\w+$",                                     1 },
-{ "îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",  "^\\w+$",                                     1 },
+static struct testline loctestdata[] = {
+{ u8"élan",                 u8"^\\w+$",                                   1 },
+{ u8"flêche",               u8"^\\w+$",                                   1 },
+{ u8"régulières",           u8"^\\w+$",                                   1 },
+{ u8"zÇUùÑ_yÿáCêÑ5Ä6ÑøýCT", u8"^\\w+$",                                   1 },
+{ u8"NéÊêËµ62aßªÈÈfÞÀvFlï", u8"^\\w+$",                                   1 },
+{ u8"îÍz9ÅaåGÌÎhàjþõÖUÿõÀR",u8"^\\w+$",                                   1 },
+{ u8"Բարեւ_Ձեզ։",           u8"^\\w+$",                                   0 },
+{ u8"Բարեւ_Ձեզ",           u8"^\\w+$",                                   1 },
 };
 
 static const char YES[] = "yes";
@@ -103,8 +108,8 @@ int main(void) {
     printf("\nLocale:  en_US.UTF-8\n");
     printf("%-20s\t\t%-30s\tRes/Exp\n", "String", "Regex");
     printf("————————————————————————————————————————————————————————————————————————————————\n");
-    nrecords = sizeof(frtestdata) / sizeof(struct testline);
-    td = frtestdata;
+    nrecords = sizeof(loctestdata) / sizeof(struct testline);
+    td = loctestdata;
     for (i = 0; i < nrecords; i++) {
         result = regexmatch(td[i].regex, td[i].text);
 
