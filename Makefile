@@ -27,9 +27,9 @@ TESTTGT     :=  ./testexec
 
 testsuite:	test_regexes
 
-test_regexes: $(ALLSRC)
+test_regexes: TEST/testtrex.c trex.c 
 	@$(TESTSTART)
-	@$(TESTCC) testtrex.c trex.c -o $(TESTTGT)
+	@$(TESTCC) -I. TEST/testtrex.c trex.c -o $(TESTTGT)
 	@$(TESTTGT)
 	@rm $(TESTTGT)
 
