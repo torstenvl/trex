@@ -6,7 +6,7 @@
 Usage is simple: 
 
 ````C
-if regexmatch("\\\\^fcharset\\d+ ?$", rtfcommand) { 
+if (regexmatch("\\\\^fcharset\\d+ ?$", rtfcommand)) { 
     /* set the character set for the current font definition */ 
 }
 ````
