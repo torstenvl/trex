@@ -31,7 +31,7 @@ test_regexes: $(ALLSRC)
 	@$(TESTSTART)
 	@$(TESTCC) testtrex.c trex.c -o $(TESTTGT)
 	@$(TESTTGT)
-#	@rm $(TESTTGT)
+	@rm $(TESTTGT)
 
 clean:
 	@rm -Rf .DS_Store core *.o *~
