@@ -6,7 +6,7 @@
 Usage is simple: 
 
 ````C
-if (regexmatch("\\\\^fcharset\\d+ ?$", rtfcommand)) { 
+if (regexmatch("^\\\\fcharset\\d+ ?$", rtfcommand)) { 
     /* set the character set for the current font definition */ 
 }
 ````
@@ -25,3 +25,4 @@ if (regexmatch("\\\\^fcharset\\d+ ?$", rtfcommand)) {
 - No character groups or alternates, e.g., `(abc|def)`
 - No quantifiers, e.g., `\d{1,5}`
 - No support for index or match length (return value only indicates whether there's a match)
+- Locale support relies on system library iswxxxxx functions, which are broken on macOS for East Asian languages and Arabic
