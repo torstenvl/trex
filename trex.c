@@ -16,7 +16,7 @@
 static int match_xplus(const unsigned char *rex, const unsigned char *txt, const unsigned char *rexafter, int min);
 static int match_maybe(const unsigned char *rex, const unsigned char *txt, const unsigned char *rexafter);
 
-#define cdpt(s) ((s[0] < 0) ? s[0] : cdpt_func(s)) // Hot path --> ~2% speedup
+#define cdpt(s) ((s[0] < 128) ? s[0] : cdpt_func(s)) // Hot path --> ~2% speedup
 
 static int cdpt_func(const unsigned char *s) {
     // For byte patterns matching this...                                     ... get the correct bits from them and put them in the right places
