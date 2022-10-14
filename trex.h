@@ -11,7 +11,7 @@
 #ifndef TREX__
 #define TREX__
 
-#define regexmatch(...) rexmatch(__VA_ARGS__)
+#define regexmatch(x, y) (rexmatch((const unsigned char *) x, (const unsigned char *) y))
 int rexmatch(const unsigned char *rex, const unsigned char *txt);
 
 #endif
