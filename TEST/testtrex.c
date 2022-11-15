@@ -52,6 +52,7 @@ static struct testline ctestdata[] = {
 {0, 1, u8"^\\w+$",                                  u8"Բարեւ_Ձեզ"            },
 {0, 1, u8"^\\w+$",                                  u8"مرحبًا؟"               },
 {0, 1, u8"^\\w+$",                                  u8"مرحبًا"                },
+{0, 1, u8"^\\w+$",                                  u8"🇺🇸"                   },
 };
 
 static struct testline loctestdata[] = {
