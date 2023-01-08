@@ -1,40 +1,57 @@
-ifeq ($(shell cc -v 2>&1 | grep clang),"")
-	CC           :=  gcc
-	WEXCLUDE     :=	
-	WEVERYTHING  :=	
-    CFLAGS       :=  -std=c11 -funsigned-char -Os
-    STRICT       :=  -W -Wall -Werror -Wextra $(WEVERYTHING) $(WEXCLUDE)
-else
-	CC           :=  clang
-	WEXCLUDE     :=  -Wno-poison-system-directories -Wno-c99-compat
-	WEVERYTHING  :=  -Weverything 
-    CFLAGS       :=  -std=c11 -funsigned-char -Oz
-    STRICT       :=  -W -Wall -Werror -Wextra $(WEVERYTHING) $(WEXCLUDE)
-endif
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+#                                CONFIGURATION
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+override \
+CFLAGS     +=  -funsigned-char \
+               -W -Wall -Wextra -Werror \
+               -Wno-unknown-warning -Wno-unknown-warning-option -Wno-padded \
+               -Wno-parentheses -Wno-c99-compat -Wno-unused-function \
+               -Isrc -Itemplib \
+			   -DBUILDSTAMP=$(shell date +"%Y%m%d.%H%M%S")
+REL        :=  $(CFLAGS) -Ofast -DNDEBUG
+DBG        :=  $(CFLAGS) -O1    -gddb3
 
-all:		test
-test:		testsuiteprologue testsuite testsuiteepilogue
-testsuiteprologue:
-	@echo
-	@echo "RUNNING TEST SUITE"
-	@echo "——————————————————"
-testsuiteepilogue:
-	@echo
+FORCEPREP  :=  $(shell mkdir -p templib &&  find . -iregex ".*src/.*\.[ch].*" -exec cp -a {} templib/ \;)
+VPATH       =  templib
 
-TESTSTART   =   printf "%s %-36s\n" "Testing" $(subst test_,,$@)
-TESTCC      :=  $(CC) $(CFLAGS) $(STRICT)
-TESTTGT     :=  ./testexec
 
-testsuite:	test_regexes
 
-test_regexes: TEST/testtrex.c trex.c 
-	@$(TESTSTART)
-	@$(TESTCC) -I. TEST/testtrex.c trex.c -o $(TESTTGT)
-	@$(TESTTGT)
-	@rm $(TESTTGT)
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+#                                   TARGETS
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+.PHONY:			clean test
+all:			test
+
+%.o : %.c
+	@$(CC) $(REL) -c $<
 
 clean:
-	@rm -Rf .DS_Store core *.o *~
-	@rm -Rf *.dSYM/ */*.dSYM
-	@rm -Rf $(TESTTGT)
-	@echo Repository cleaned
+	@rm -fr   .DS_Store    Thumbs.db    core    *.dSYM    *.o
+	@rm -fr */.DS_Store  */Thumbs.db  */core  */*.dSYM  */*.o
+	-@$(foreach dir,$(shell find modules -type d -depth 1 2>/dev/null),$(MAKE) clean -C $(dir) ;)
+	@rm -fr $(TESTEXE) templib
+
+
+
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+#                                 TEST HARNESS
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+TESTEXE     =   ./testprog
+TESTSTART   =   printf "%s %-36s" "Testing" $(subst test_,,$@...)
+TESTEND     =   printf "\342\234\205 OK\n" || printf "\342\235\214\033[1;31m FAILED!!!\033[m\n"
+TESTCC      =   $(CC) $(REL) -o $(TESTEXE)
+test: 			testbegin testsuite testfinish
+testbegin:	;	@printf "RUNNING TEST SUITE\n——————————————————\n" 
+testfinish:	;	@rm -fr $(TESTEXE) templib temp.rtf test/latepartial-output.rtf test/letter-output.rtf
+
+
+
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+#                                SPECIFIC TESTS
+#–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+testsuite:	test_regexes
+
+test_regexes: trex.o TEST/testtrex.c
+	@$(TESTSTART)
+	@$(TESTCC) trex.o TEST/testtrex.c -o $(TESTEXE)
+	@$(TESTEXE) && $(TESTEND)
